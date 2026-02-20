@@ -17,7 +17,7 @@ export default async function DashboardLayout({
     // Obtener perfil del usuario
     const { data: profile } = await supabase
         .from('usuarios')
-        .select('nombre_completo, empresa')
+        .select('nombre_completo, empresa, logo_url')
         .eq('id', user.id)
         .single()
 
@@ -27,6 +27,7 @@ export default async function DashboardLayout({
                 userName={profile?.nombre_completo || user.email || 'Usuario'}
                 userCompany={profile?.empresa || ''}
                 userEmail={user.email || ''}
+                userLogo={profile?.logo_url || null}
             />
             <main className="flex-1 overflow-auto">
                 <div className="p-6 lg:p-8">

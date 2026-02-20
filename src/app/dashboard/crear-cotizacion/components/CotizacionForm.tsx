@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { saveCotizacion } from '../actions'
 import { ItemSelector, type LineItem } from './ItemSelector'
 import { FirmaUpload } from './FirmaUpload'
+import { AICotizar } from './AICotizar'
 
 interface CatalogItem {
     id: string
@@ -80,6 +81,37 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
         ))
     }
 
+    // Handler para resultados de IA
+    function handleAIResult(result: {
+        cliente_nombre?: string
+        cliente_email?: string
+        items: { item_id: string; nombre: string; cantidad: number; precio_unitario: number }[]
+        notas_sugeridas?: string
+    }) {
+        // Auto-completar cliente
+        if (result.cliente_nombre) setClienteNombre(result.cliente_nombre)
+        if (result.cliente_email) setClienteEmail(result.cliente_email)
+
+        // Auto-completar ítems
+        if (result.items && result.items.length > 0) {
+            const newItems: LineItem[] = result.items.map(item => ({
+                item_id: item.item_id,
+                nombre: item.nombre,
+                codigo_sku: catalogItems.find(c => c.id === item.item_id)?.codigo_sku || null,
+                cantidad: item.cantidad,
+                precio_unitario: item.precio_unitario,
+                precio_total: item.precio_unitario * item.cantidad,
+            }))
+            setLineItems(prev => [...prev, ...newItems])
+        }
+
+        // Auto-completar notas si las hay
+        if (result.notas_sugeridas) {
+            setNotas(prev => prev ? prev + '\n' + result.notas_sugeridas : result.notas_sugeridas!)
+            setShowNotas(true)
+        }
+    }
+
     async function handleSave() {
         if (!clienteNombre.trim()) {
             setError('El nombre del cliente es obligatorio')
@@ -121,7 +153,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
         setSaving(false)
 
         setTimeout(() => {
-            router.push('/dashboard')
+            router.push(`/dashboard/cotizacion/${result.id}`)
         }, 2000)
     }
 
@@ -197,6 +229,12 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                     </svg>
                     Ítems de la Cotización
                 </h2>
+
+                {/* Botón IA */}
+                <div className="mb-4">
+                    <AICotizar catalogItems={catalogItems} onResult={handleAIResult} />
+                </div>
+
                 <ItemSelector
                     catalogItems={catalogItems}
                     lineItems={lineItems}
