@@ -91,7 +91,7 @@ export default async function DashboardPage() {
                         </div>
                     </a>
                     <a
-                        href="/dashboard/cotizaciones/nueva"
+                        href="/dashboard/crear-cotizacion"
                         className="flex items-center gap-4 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-violet-500/30 hover:bg-slate-800 transition-all duration-200 group"
                     >
                         <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors">
