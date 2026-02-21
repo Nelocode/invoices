@@ -151,6 +151,17 @@ export default function LoginPage() {
                                 isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'
                             )}
                         </button>
+
+                        {isLogin && (
+                            <div className="mt-4 text-center">
+                                <a
+                                    href="/recuperar"
+                                    className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+                                >
+                                    ¿Olvidaste tu contraseña?
+                                </a>
+                            </div>
+                        )}
                     </form>
                 </div>
 
