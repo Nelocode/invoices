@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { createClient } from '@/lib/supabase/server'
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-})
-
 export async function POST(request: NextRequest) {
     try {
+        const openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+        })
+
         // Verificar autenticación
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
