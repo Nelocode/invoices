@@ -6,7 +6,7 @@ export default async function CrearCotizacionPage() {
 
     const { data: items } = await supabase
         .from('items')
-        .select('id, nombre, codigo_sku, precio_base')
+        .select('id, nombre, codigo_sku, precio_base, categoria, recurrencia')
         .order('nombre', { ascending: true })
 
     return (
