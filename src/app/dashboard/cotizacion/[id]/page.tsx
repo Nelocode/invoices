@@ -36,6 +36,8 @@ export default async function CotizacionViewPage({ params }: Props) {
             cantidad,
             precio_unitario,
             precio_total,
+            categoria,
+            recurrencia,
             items (
                 nombre,
                 codigo_sku
@@ -60,6 +62,7 @@ export default async function CotizacionViewPage({ params }: Props) {
         usuario_empresa: profile?.empresa || null,
         usuario_email: user.email || '',
         usuario_logo_url: profile?.logo_url || null,
+        tipo_documento: cotizacion.tipo_documento || 'cotizacion',
         items: (cotizacionItems || []).map((ci: Record<string, unknown>) => {
             const items = ci.items as { nombre: string; codigo_sku: string | null } | null
             return {
@@ -68,6 +71,8 @@ export default async function CotizacionViewPage({ params }: Props) {
                 cantidad: ci.cantidad as number,
                 precio_unitario: ci.precio_unitario as number,
                 precio_total: ci.precio_total as number,
+                categoria: ci.categoria as string | undefined,
+                recurrencia: ci.recurrencia as string | null | undefined,
             }
         }),
     }

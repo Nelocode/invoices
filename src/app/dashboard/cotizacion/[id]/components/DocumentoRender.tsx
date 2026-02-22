@@ -1,7 +1,9 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { DescargarPDFButton } from './DescargarPDFButton'
+import { convertirDocumento } from '../actions'
+import { useRouter } from 'next/navigation'
 
 interface LineItem {
     nombre: string
@@ -9,6 +11,8 @@ interface LineItem {
     cantidad: number
     precio_unitario: number
     precio_total: number
+    categoria?: string
+    recurrencia?: string | null
 }
 
 export interface CotizacionData {
@@ -28,11 +32,21 @@ export interface CotizacionData {
     usuario_empresa: string | null
     usuario_email: string
     usuario_logo_url: string | null
+    tipo_documento: string
     items: LineItem[]
 }
 
 export function DocumentoRender({ data }: { data: CotizacionData }) {
     const docRef = useRef<HTMLDivElement>(null)
+    const router = useRouter()
+    const [isConverting, setIsConverting] = useState(false)
+
+    const handleConvert = async (tipo: 'cuenta_cobro' | 'factura_proforma') => {
+        setIsConverting(true)
+        await convertirDocumento(data.id, tipo)
+        setIsConverting(false)
+        router.refresh()
+    }
 
     const formatPrice = (n: number) =>
         new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(n)
@@ -74,6 +88,23 @@ export function DocumentoRender({ data }: { data: CotizacionData }) {
                             }`} />
                         {data.estado}
                     </span>
+
+                    {data.tipo_documento === 'cotizacion' && (
+                        <div className="relative group">
+                            <button disabled={isConverting} className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm font-medium hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-50">
+                                {isConverting ? 'Convirtiendo...' : 'Convertir...'}
+                            </button>
+                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 border border-slate-100 overflow-hidden">
+                                <button onClick={() => handleConvert('cuenta_cobro')} className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium border-b border-slate-100 cursor-pointer">
+                                    Cuenta de Cobro
+                                </button>
+                                <button onClick={() => handleConvert('factura_proforma')} className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium cursor-pointer">
+                                    Factura Proforma
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     <DescargarPDFButton targetRef={docRef} cotizacionId={cotNumber} />
                 </div>
             </div>
@@ -131,7 +162,7 @@ export function DocumentoRender({ data }: { data: CotizacionData }) {
                             color: '#fc7ebf',
                             marginBottom: '4px',
                         }}>
-                            COTIZACIÓN
+                            {data.tipo_documento === 'cuenta_cobro' ? 'CUENTA DE COBRO' : data.tipo_documento === 'factura_proforma' ? 'FACTURA PROFORMA' : 'COTIZACIÓN'}
                         </div>
                         <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.02em' }}>
                             #{cotNumber}
@@ -215,37 +246,151 @@ export function DocumentoRender({ data }: { data: CotizacionData }) {
                         <div style={{ flex: 1.5, textAlign: 'right' }}>Total</div>
                     </div>
 
-                    {/* Filas */}
-                    {data.items.map((item, i) => (
-                        <div key={i} style={{
-                            display: 'flex',
-                            padding: '14px 16px',
-                            borderLeft: '1px solid rgba(255,255,255,0.05)',
-                            borderRight: '1px solid rgba(255,255,255,0.05)',
-                            borderBottom: '1px solid rgba(255,255,255,0.05)',
-                            background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
-                            fontSize: '12px',
-                            alignItems: 'center',
-                        }}>
-                            <div style={{ flex: 3 }}>
-                                <div style={{ fontWeight: 600 }}>{item.nombre}</div>
-                                {item.codigo_sku && (
-                                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>
-                                        SKU: {item.codigo_sku}
+                    {/* GRUPO: Pago Único */}
+                    {data.items.some(i => !i.categoria || i.categoria === 'Pago único') && (
+                        <>
+                            {data.items.filter(i => !i.categoria || i.categoria === 'Pago único').map((item, i) => (
+                                <div key={`unico-${i}`} style={{
+                                    display: 'flex',
+                                    padding: '14px 16px',
+                                    borderLeft: '1px solid rgba(255,255,255,0.05)',
+                                    borderRight: '1px solid rgba(255,255,255,0.05)',
+                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
+                                    fontSize: '12px',
+                                    alignItems: 'center',
+                                }}>
+                                    <div style={{ flex: 3 }}>
+                                        <div style={{ fontWeight: 600 }}>{item.nombre}</div>
+                                        {item.codigo_sku && (
+                                            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>
+                                                SKU: {item.codigo_sku}
+                                            </div>
+                                        )}
                                     </div>
-                                )}
+                                    <div style={{ flex: 1, textAlign: 'center', color: 'rgba(255,255,255,0.7)' }}>
+                                        {item.cantidad}
+                                    </div>
+                                    <div style={{ flex: 1.5, textAlign: 'right', color: 'rgba(255,255,255,0.7)' }}>
+                                        {formatPrice(item.precio_unitario)}
+                                    </div>
+                                    <div style={{ flex: 1.5, textAlign: 'right', fontWeight: 600 }}>
+                                        {formatPrice(item.precio_total)}
+                                    </div>
+                                </div>
+                            ))}
+                        </>
+                    )}
+
+                    {/* GRUPO: Pago Recurrente */}
+                    {data.items.some(i => i.categoria === 'Pago recurrente') && (
+                        <>
+                            <div style={{
+                                padding: '8px 16px',
+                                background: 'rgba(255,255,255,0.04)',
+                                borderLeft: '1px solid rgba(255,255,255,0.05)',
+                                borderRight: '1px solid rgba(255,255,255,0.05)',
+                                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                color: '#a855f7',
+                                letterSpacing: '0.05em',
+                                textTransform: 'uppercase'
+                            }}>
+                                Pagos Recurrentes
                             </div>
-                            <div style={{ flex: 1, textAlign: 'center', color: 'rgba(255,255,255,0.7)' }}>
-                                {item.cantidad}
+                            {data.items.filter(i => i.categoria === 'Pago recurrente').map((item, i) => (
+                                <div key={`rec-${i}`} style={{
+                                    display: 'flex',
+                                    padding: '14px 16px',
+                                    borderLeft: '1px solid rgba(255,255,255,0.05)',
+                                    borderRight: '1px solid rgba(255,255,255,0.05)',
+                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
+                                    fontSize: '12px',
+                                    alignItems: 'center',
+                                }}>
+                                    <div style={{ flex: 3 }}>
+                                        <div style={{ fontWeight: 600 }}>{item.nombre} <span style={{ fontWeight: 'normal', color: 'rgba(255,255,255,0.6)' }}>- {item.recurrencia}</span></div>
+                                        {item.codigo_sku && (
+                                            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>
+                                                SKU: {item.codigo_sku}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div style={{ flex: 1, textAlign: 'center', color: 'rgba(255,255,255,0.7)' }}>
+                                        {item.cantidad}
+                                    </div>
+                                    <div style={{ flex: 1.5, textAlign: 'right', color: 'rgba(255,255,255,0.7)' }}>
+                                        {formatPrice(item.precio_unitario)}
+                                    </div>
+                                    <div style={{ flex: 1.5, textAlign: 'right', fontWeight: 600 }}>
+                                        {formatPrice(item.precio_total)}
+                                    </div>
+                                </div>
+                            ))}
+                        </>
+                    )}
+
+                    {/* GRUPO: Costo Adicional */}
+                    {data.items.some(i => i.categoria === 'Costo adicional') && (
+                        <>
+                            <div style={{
+                                padding: '8px 16px',
+                                background: 'rgba(245,158,11,0.08)',
+                                borderLeft: '1px solid rgba(255,255,255,0.05)',
+                                borderRight: '1px solid rgba(255,255,255,0.05)',
+                                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                color: '#fcd34d',
+                                letterSpacing: '0.05em',
+                                textTransform: 'uppercase'
+                            }}>
+                                Costos Adicionales (Terceros)
                             </div>
-                            <div style={{ flex: 1.5, textAlign: 'right', color: 'rgba(255,255,255,0.7)' }}>
-                                {formatPrice(item.precio_unitario)}
+                            {data.items.filter(i => i.categoria === 'Costo adicional').map((item, i) => (
+                                <div key={`add-${i}`} style={{
+                                    display: 'flex',
+                                    padding: '14px 16px',
+                                    borderLeft: '1px solid rgba(255,255,255,0.05)',
+                                    borderRight: '1px solid rgba(255,255,255,0.05)',
+                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    background: 'rgba(255,255,255,0.01)',
+                                    fontSize: '12px',
+                                    alignItems: 'center',
+                                }}>
+                                    <div style={{ flex: 3 }}>
+                                        <div style={{ fontWeight: 600 }}>{item.nombre}</div>
+                                        {item.codigo_sku && (
+                                            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>
+                                                SKU: {item.codigo_sku}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div style={{ flex: 1, textAlign: 'center', color: 'rgba(255,255,255,0.7)' }}>
+                                        {item.cantidad}
+                                    </div>
+                                    <div style={{ flex: 1.5, textAlign: 'right', color: 'rgba(255,255,255,0.7)' }}>
+                                        {formatPrice(item.precio_unitario)}
+                                    </div>
+                                    <div style={{ flex: 1.5, textAlign: 'right', fontWeight: 600, color: '#fcd34d' }}>
+                                        {formatPrice(item.precio_total)}
+                                    </div>
+                                </div>
+                            ))}
+                            <div style={{
+                                padding: '10px 16px',
+                                fontSize: '10px',
+                                color: 'rgba(255,255,255,0.5)',
+                                borderLeft: '1px solid rgba(255,255,255,0.05)',
+                                borderRight: '1px solid rgba(255,255,255,0.05)',
+                                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                            }}>
+                                * Estos valores son referenciales, no se incluyen en el subtotal ni total de este documento, y generalmente se pagan a terceros.
                             </div>
-                            <div style={{ flex: 1.5, textAlign: 'right', fontWeight: 600 }}>
-                                {formatPrice(item.precio_total)}
-                            </div>
-                        </div>
-                    ))}
+                        </>
+                    )}
 
                     {/* Resumen financiero */}
                     <div style={{

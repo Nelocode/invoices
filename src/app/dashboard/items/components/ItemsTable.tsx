@@ -13,6 +13,8 @@ interface Item {
     descripcion: string | null
     precio_base: number
     notas_internas: string | null
+    categoria: string
+    recurrencia: string | null
     creado_en: string
 }
 
@@ -61,7 +63,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                 }
                 setItems(prev => prev.map(i =>
                     i.id === editingItem.id
-                        ? { ...i, ...data, codigo_sku: data.codigo_sku || null, descripcion: data.descripcion || null, notas_internas: data.notas_internas || null }
+                        ? { ...i, ...data, codigo_sku: data.codigo_sku || null, descripcion: data.descripcion || null, notas_internas: data.notas_internas || null, categoria: data.categoria, recurrencia: data.recurrencia || null }
                         : i
                 ))
             } else {
@@ -133,12 +135,12 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder="Buscar por nombre, SKU o descripción..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                     />
                 </div>
                 <button
                     onClick={openCreate}
-                    className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-medium rounded-xl hover:from-indigo-500 hover:to-violet-500 transition-all shadow-lg shadow-indigo-500/25 text-sm whitespace-nowrap cursor-pointer"
+                    className="px-5 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white font-medium rounded-xl hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg shadow-fuchsia-500/25 text-sm whitespace-nowrap cursor-pointer"
                 >
                     + Nuevo Ítem
                 </button>
@@ -163,7 +165,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                     {!search && (
                         <button
                             onClick={openCreate}
-                            className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-medium rounded-xl hover:from-indigo-500 hover:to-violet-500 transition-all shadow-lg shadow-indigo-500/25 text-sm cursor-pointer"
+                            className="px-5 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white font-medium rounded-xl hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg shadow-fuchsia-500/25 text-sm cursor-pointer"
                         >
                             Crear primer ítem
                         </button>
@@ -178,6 +180,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                                 <tr className="border-b border-slate-800">
                                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Ítem</th>
                                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">SKU</th>
+                                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Categoría</th>
                                     <th className="text-right px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Precio base</th>
                                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Fecha</th>
                                     <th className="text-right px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Acciones</th>
@@ -201,6 +204,14 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                                                 <span className="text-xs text-slate-600">—</span>
                                             )}
                                         </td>
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 text-slate-300">
+                                                {item.categoria}
+                                                {item.categoria === 'Pago recurrente' && item.recurrencia && (
+                                                    <span className="text-slate-500">/ {item.recurrencia}</span>
+                                                )}
+                                            </span>
+                                        </td>
                                         <td className="px-6 py-4 text-right">
                                             <span className="text-sm font-semibold text-emerald-400">{formatPrice(item.precio_base)}</span>
                                         </td>
@@ -211,7 +222,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                                             <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => openEdit(item)}
-                                                    className="p-2 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all cursor-pointer"
+                                                    className="p-2 rounded-lg text-slate-400 hover:text-fuchsia-400 hover:bg-fuchsia-500/10 transition-all cursor-pointer"
                                                     title="Editar"
                                                 >
                                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -247,6 +258,10 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                                                 {item.codigo_sku}
                                             </span>
                                         )}
+                                        <span className="inline-block mt-1 ml-2 px-2 py-0.5 text-xs font-medium bg-slate-800 text-slate-300 rounded-md">
+                                            {item.categoria}
+                                            {item.categoria === 'Pago recurrente' && item.recurrencia && ` / ${item.recurrencia}`}
+                                        </span>
                                     </div>
                                     <span className="text-sm font-semibold text-emerald-400 ml-3 shrink-0">{formatPrice(item.precio_base)}</span>
                                 </div>
@@ -258,7 +273,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                                     <div className="flex gap-1">
                                         <button
                                             onClick={() => openEdit(item)}
-                                            className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all cursor-pointer"
+                                            className="p-1.5 rounded-lg text-slate-400 hover:text-fuchsia-400 hover:bg-fuchsia-500/10 transition-all cursor-pointer"
                                         >
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />

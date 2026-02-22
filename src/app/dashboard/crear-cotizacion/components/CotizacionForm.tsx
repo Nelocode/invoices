@@ -6,12 +6,15 @@ import { saveCotizacion } from '../actions'
 import { ItemSelector, type LineItem } from './ItemSelector'
 import { FirmaUpload } from './FirmaUpload'
 import { AICotizar } from './AICotizar'
+import { AIWriterButton } from '@/components/AIWriterButton'
 
 interface CatalogItem {
     id: string
     nombre: string
     codigo_sku: string | null
     precio_base: number
+    categoria: string
+    recurrencia: string | null
 }
 
 interface CotizacionFormProps {
@@ -46,8 +49,10 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
     // Firma
     const [firmaUrl, setFirmaUrl] = useState<string | null>(null)
 
-    // Cálculos
-    const subtotal = lineItems.reduce((sum, li) => sum + li.precio_total, 0)
+    // Cálculos (Excluyendo Costos Adicionales)
+    const subtotal = lineItems
+        .filter(li => li.categoria !== 'Costo adicional')
+        .reduce((sum, li) => sum + li.precio_total, 0)
     const impuestos = subtotal * (taxPercent / 100)
     const total = subtotal + impuestos
 
@@ -62,6 +67,8 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             cantidad: 1,
             precio_unitario: item.precio_base,
             precio_total: item.precio_base,
+            categoria: item.categoria,
+            recurrencia: item.recurrencia,
         }])
     }
 
@@ -94,14 +101,19 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
 
         // Auto-completar ítems
         if (result.items && result.items.length > 0) {
-            const newItems: LineItem[] = result.items.map(item => ({
-                item_id: item.item_id,
-                nombre: item.nombre,
-                codigo_sku: catalogItems.find(c => c.id === item.item_id)?.codigo_sku || null,
-                cantidad: item.cantidad,
-                precio_unitario: item.precio_unitario,
-                precio_total: item.precio_unitario * item.cantidad,
-            }))
+            const newItems: LineItem[] = result.items.map(item => {
+                const catalogItem = catalogItems.find(c => c.id === item.item_id)
+                return {
+                    item_id: item.item_id,
+                    nombre: item.nombre,
+                    codigo_sku: catalogItem?.codigo_sku || null,
+                    cantidad: item.cantidad,
+                    precio_unitario: item.precio_unitario,
+                    precio_total: item.precio_unitario * item.cantidad,
+                    categoria: catalogItem?.categoria || 'Pago único',
+                    recurrencia: catalogItem?.recurrencia || null,
+                }
+            })
             setLineItems(prev => [...prev, ...newItems])
         }
 
@@ -140,6 +152,8 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                 cantidad: li.cantidad,
                 precio_unitario: li.precio_unitario,
                 precio_total: li.precio_total,
+                categoria: li.categoria,
+                recurrencia: li.recurrencia,
             })),
         })
 
@@ -188,7 +202,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             {/* 1. Datos del cliente */}
             <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
                     Datos del Cliente
@@ -203,7 +217,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                             value={clienteNombre}
                             onChange={e => setClienteNombre(e.target.value)}
                             placeholder="Nombre del cliente o empresa"
-                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                         />
                     </div>
                     <div>
@@ -215,7 +229,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                             value={clienteEmail}
                             onChange={e => setClienteEmail(e.target.value)}
                             placeholder="cliente@empresa.com"
-                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                         />
                     </div>
                 </div>
@@ -224,7 +238,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             {/* 2. Ítems de la cotización */}
             <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                     </svg>
                     Ítems de la Cotización
@@ -248,12 +262,19 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             {/* 3. Resumen financiero */}
             <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
                     </svg>
                     Resumen
                 </h2>
                 <div className="max-w-sm ml-auto space-y-3">
+                    {lineItems.some(li => li.categoria === 'Costo adicional') && (
+                        <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                            <p className="text-xs text-amber-400 leading-relaxed">
+                                <strong>Nota:</strong> Los costos adicionales son informativos y no se suman al total de la cotización ya que se pagan directamente a terceros.
+                            </p>
+                        </div>
+                    )}
                     <div className="flex items-center justify-between text-sm">
                         <span className="text-slate-400">Subtotal</span>
                         <span className="text-white font-medium">{formatPrice(subtotal)}</span>
@@ -268,7 +289,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                                 min={0}
                                 max={100}
                                 step={0.5}
-                                className="w-20 px-2 py-1 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                className="w-20 px-2 py-1 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all"
                             />
                             <span className="text-slate-500 text-sm">%</span>
                             <span className="text-white font-medium ml-2">{formatPrice(impuestos)}</span>
@@ -284,7 +305,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             {/* 4. Secciones opcionales con toggles */}
             <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 space-y-5">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                    <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
                     </svg>
                     Secciones Adicionales
@@ -296,13 +317,18 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                     enabled={showNotas}
                     onToggle={() => setShowNotas(!showNotas)}
                 >
-                    <textarea
-                        value={notas}
-                        onChange={e => setNotas(e.target.value)}
-                        rows={3}
-                        placeholder="Ej: Este presupuesto tiene validez de 30 días..."
-                        className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
-                    />
+                    <div className="relative">
+                        <textarea
+                            value={notas}
+                            onChange={e => setNotas(e.target.value)}
+                            rows={3}
+                            placeholder="Ej: Este presupuesto tiene validez de 30 días..."
+                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all resize-none pr-12"
+                        />
+                        <div className="absolute top-2 right-2">
+                            <AIWriterButton currentText={notas} context="Notas generales de la cotización, aclaratoria de comercialización o validez" onUpdate={setNotas} />
+                        </div>
+                    </div>
                 </ToggleSection>
 
                 {/* Temas legales */}
@@ -311,13 +337,18 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                     enabled={showLegal}
                     onToggle={() => setShowLegal(!showLegal)}
                 >
-                    <textarea
-                        value={temaLegal}
-                        onChange={e => setTemaLegal(e.target.value)}
-                        rows={3}
-                        placeholder="Ej: Los precios no incluyen IVA. Términos y condiciones aplican..."
-                        className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
-                    />
+                    <div className="relative">
+                        <textarea
+                            value={temaLegal}
+                            onChange={e => setTemaLegal(e.target.value)}
+                            rows={3}
+                            placeholder="Ej: Los precios no incluyen IVA. Términos y condiciones aplican..."
+                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all resize-none pr-12"
+                        />
+                        <div className="absolute top-2 right-2">
+                            <AIWriterButton currentText={temaLegal} context="Términos legales y condiciones comerciales" onUpdate={setTemaLegal} />
+                        </div>
+                    </div>
                 </ToggleSection>
 
                 {/* Exclusiones */}
@@ -326,20 +357,25 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                     enabled={showExclusiones}
                     onToggle={() => setShowExclusiones(!showExclusiones)}
                 >
-                    <textarea
-                        value={exclusiones}
-                        onChange={e => setExclusiones(e.target.value)}
-                        rows={3}
-                        placeholder="Ej: No incluye transporte, instalación ni materiales adicionales..."
-                        className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
-                    />
+                    <div className="relative">
+                        <textarea
+                            value={exclusiones}
+                            onChange={e => setExclusiones(e.target.value)}
+                            rows={3}
+                            placeholder="Ej: No incluye transporte, instalación ni materiales adicionales..."
+                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all resize-none pr-12"
+                        />
+                        <div className="absolute top-2 right-2">
+                            <AIWriterButton currentText={exclusiones} context="Cosas que no están incluidas o cubiertas en el servicio/producto" onUpdate={setExclusiones} />
+                        </div>
+                    </div>
                 </ToggleSection>
             </section>
 
             {/* 5. Firma */}
             <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
                     </svg>
                     Firma (Opcional)
@@ -353,7 +389,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                     type="button"
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold rounded-xl hover:from-indigo-500 hover:to-violet-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-950 transition-all shadow-lg shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm"
+                    className="px-8 py-3 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white font-semibold rounded-xl hover:from-fuchsia-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 focus:ring-offset-slate-950 transition-all shadow-lg shadow-fuchsia-500/25 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm"
                 >
                     {saving ? (
                         <span className="flex items-center gap-2">
@@ -391,7 +427,7 @@ function ToggleSection({
                 <button
                     type="button"
                     onClick={onToggle}
-                    className={`relative w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer ${enabled ? 'bg-indigo-600' : 'bg-slate-700'
+                    className={`relative w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer ${enabled ? 'bg-fuchsia-600' : 'bg-slate-700'
                         }`}
                 >
                     <span

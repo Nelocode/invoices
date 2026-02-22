@@ -80,13 +80,13 @@ export function Sidebar({ userName, userCompany, userEmail, userLogo }: SidebarP
                             <img src={userLogo} alt={userCompany || 'Logo'} className="max-h-full max-w-full object-contain" />
                         </div>
                     ) : (
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-lg shadow-fuchsia-500/25">
                             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                         </div>
                     )}
-                    <p className="text-xs text-indigo-400 font-medium tracking-wider uppercase">Invoices</p>
+                    <p className="text-xs text-fuchsia-400 font-medium tracking-wider uppercase">Invoices</p>
                 </div>
             </div>
 
@@ -98,7 +98,7 @@ export function Sidebar({ userName, userCompany, userEmail, userLogo }: SidebarP
                         href={item.href}
                         onClick={() => setMobileOpen(false)}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href)
-                            ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20 shadow-lg shadow-indigo-500/5'
+                            ? 'bg-fuchsia-600/10 text-fuchsia-400 border border-fuchsia-500/20 shadow-lg shadow-fuchsia-500/5'
                             : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                             }`}
                     >
@@ -111,7 +111,7 @@ export function Sidebar({ userName, userCompany, userEmail, userLogo }: SidebarP
             {/* Perfil + Logout */}
             <div className="p-4 border-t border-slate-800">
                 <div className="flex items-center gap-3 px-4 py-3 mb-2">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
                         {userName.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">

@@ -9,6 +9,8 @@ export interface ItemFormData {
     descripcion: string
     precio_base: number
     notas_internas: string
+    categoria: string
+    recurrencia?: string
 }
 
 export async function getItems() {
@@ -35,6 +37,8 @@ export async function createItem(formData: ItemFormData) {
         descripcion: formData.descripcion || null,
         precio_base: formData.precio_base,
         notas_internas: formData.notas_internas || null,
+        categoria: formData.categoria || 'Pago único',
+        recurrencia: formData.categoria === 'Pago recurrente' ? formData.recurrencia : null,
     })
 
     if (error) return { error: error.message }
@@ -55,6 +59,8 @@ export async function updateItem(id: string, formData: ItemFormData) {
             descripcion: formData.descripcion || null,
             precio_base: formData.precio_base,
             notas_internas: formData.notas_internas || null,
+            categoria: formData.categoria || 'Pago único',
+            recurrencia: formData.categoria === 'Pago recurrente' ? formData.recurrencia : null,
         })
         .eq('id', id)
 

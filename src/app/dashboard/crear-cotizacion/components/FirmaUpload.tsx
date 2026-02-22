@@ -54,7 +54,7 @@ export function FirmaUpload({ firmaUrl, onUploaded }: FirmaUploadProps) {
                     <button
                         type="button"
                         onClick={() => inputRef.current?.click()}
-                        className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer"
+                        className="text-sm text-fuchsia-400 hover:text-fuchsia-300 transition-colors cursor-pointer"
                     >
                         Cambiar firma
                     </button>
@@ -64,7 +64,7 @@ export function FirmaUpload({ firmaUrl, onUploaded }: FirmaUploadProps) {
                     type="button"
                     onClick={() => inputRef.current?.click()}
                     disabled={uploading}
-                    className="w-full py-6 border-2 border-dashed border-slate-700 rounded-xl text-slate-400 hover:border-indigo-500/50 hover:text-indigo-400 transition-all cursor-pointer disabled:opacity-50"
+                    className="w-full py-6 border-2 border-dashed border-slate-700 rounded-xl text-slate-400 hover:border-fuchsia-500/50 hover:text-fuchsia-400 transition-all cursor-pointer disabled:opacity-50"
                 >
                     {uploading ? (
                         <span className="flex items-center justify-center gap-2">

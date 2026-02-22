@@ -103,7 +103,7 @@ export default function KanbanBoard({ initialCotizaciones }: { initialCotizacion
                                             value={cot.estado}
                                             onChange={(e) => handleChangeEstado(cot.id, e.target.value)}
                                             disabled={updating === cot.id}
-                                            className="w-full bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-indigo-500 disabled:opacity-50"
+                                            className="w-full bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-fuchsia-500 disabled:opacity-50"
                                         >
                                             {ESTADOS.map(e => (
                                                 <option key={e.id} value={e.id}>{e.label}</option>

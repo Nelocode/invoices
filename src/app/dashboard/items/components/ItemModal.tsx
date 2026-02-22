@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import type { ItemFormData } from '../actions'
+import { AIWriterButton } from '@/components/AIWriterButton'
 
 interface Item {
     id: string
@@ -10,6 +11,8 @@ interface Item {
     descripcion: string | null
     precio_base: number
     notas_internas: string | null
+    categoria: string
+    recurrencia: string | null
     creado_en: string
 }
 
@@ -28,6 +31,8 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
     const [descripcion, setDescripcion] = useState('')
     const [precioBase, setPrecioBase] = useState('')
     const [notasInternas, setNotasInternas] = useState('')
+    const [categoria, setCategoria] = useState('Pago único')
+    const [recurrencia, setRecurrencia] = useState('Mensual')
 
     useEffect(() => {
         if (item) {
@@ -36,12 +41,16 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
             setDescripcion(item.descripcion || '')
             setPrecioBase(String(item.precio_base))
             setNotasInternas(item.notas_internas || '')
+            setCategoria(item.categoria || 'Pago único')
+            setRecurrencia(item.recurrencia || 'Mensual')
         } else {
             setNombre('')
             setCodigoSku('')
             setDescripcion('')
             setPrecioBase('')
             setNotasInternas('')
+            setCategoria('Pago único')
+            setRecurrencia('Mensual')
         }
     }, [item, isOpen])
 
@@ -55,6 +64,8 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
             descripcion,
             precio_base: parseFloat(precioBase) || 0,
             notas_internas: notasInternas,
+            categoria,
+            recurrencia: categoria === 'Pago recurrente' ? recurrencia : undefined,
         })
     }
 
@@ -97,7 +108,7 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
                                 onChange={e => setNombre(e.target.value)}
                                 required
                                 placeholder="Ej: Diseño de vivienda campestre"
-                                className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                             />
                         </div>
 
@@ -110,7 +121,7 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
                                 value={codigoSku}
                                 onChange={e => setCodigoSku(e.target.value)}
                                 placeholder="Ej: SRV-001"
-                                className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                             />
                         </div>
 
@@ -128,23 +139,63 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
                                     min="0"
                                     step="0.01"
                                     placeholder="0.00"
-                                    className="w-full pl-8 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                    className="w-full pl-8 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                                 />
                             </div>
                         </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                                Categoría <span className="text-red-400">*</span>
+                            </label>
+                            <select
+                                value={categoria}
+                                onChange={e => setCategoria(e.target.value)}
+                                className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
+                            >
+                                <option value="Pago único">Pago único</option>
+                                <option value="Pago recurrente">Pago recurrente</option>
+                                <option value="Costo adicional">Costo adicional (Informativo)</option>
+                            </select>
+                        </div>
+
+                        {categoria === 'Pago recurrente' && (
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                                    Recurrencia <span className="text-red-400">*</span>
+                                </label>
+                                <select
+                                    value={recurrencia}
+                                    onChange={e => setRecurrencia(e.target.value)}
+                                    className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
+                                >
+                                    <option value="Hora">Por Hora</option>
+                                    <option value="Día">Diario</option>
+                                    <option value="Mes">Mensual</option>
+                                    <option value="Trimestre">Trimestral</option>
+                                    <option value="Semestre">Semestral</option>
+                                    <option value="Año">Anual</option>
+                                </select>
+                            </div>
+                        )}
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-1.5">
                             Descripción
                         </label>
-                        <textarea
-                            value={descripcion}
-                            onChange={e => setDescripcion(e.target.value)}
-                            rows={2}
-                            placeholder="Descripción visible para el cliente"
-                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
-                        />
+                        <div className="relative">
+                            <textarea
+                                value={descripcion}
+                                onChange={e => setDescripcion(e.target.value)}
+                                rows={2}
+                                placeholder="Descripción visible para el cliente"
+                                className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all resize-none pr-12"
+                            />
+                            <div className="absolute top-2 right-2">
+                                <AIWriterButton currentText={descripcion} context={`Descripción breve comercial del ítem: ${nombre}`} onUpdate={setDescripcion} />
+                            </div>
+                        </div>
                     </div>
 
                     <div>
@@ -156,7 +207,7 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
                             onChange={e => setNotasInternas(e.target.value)}
                             rows={2}
                             placeholder="Solo visibles para ti (no aparecen en la cotización)"
-                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
+                            className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all resize-none"
                         />
                     </div>
 
@@ -172,7 +223,7 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-medium rounded-xl hover:from-indigo-500 hover:to-violet-500 transition-all shadow-lg shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            className="flex-1 py-2.5 px-4 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white font-medium rounded-xl hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg shadow-fuchsia-500/25 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">

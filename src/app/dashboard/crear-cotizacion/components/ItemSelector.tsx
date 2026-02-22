@@ -7,6 +7,8 @@ interface Item {
     nombre: string
     codigo_sku: string | null
     precio_base: number
+    categoria: string
+    recurrencia: string | null
 }
 
 export interface LineItem {
@@ -16,6 +18,8 @@ export interface LineItem {
     cantidad: number
     precio_unitario: number
     precio_total: number
+    categoria: string
+    recurrencia: string | null
 }
 
 interface ItemSelectorProps {
@@ -65,7 +69,7 @@ export function ItemSelector({ catalogItems, lineItems, onAdd, onRemove, onQuant
                         onChange={e => { setSearch(e.target.value); setShowDropdown(true) }}
                         onFocus={() => setShowDropdown(true)}
                         placeholder="Buscar ítem del catálogo para agregar..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                     />
                 </div>
 
@@ -80,7 +84,10 @@ export function ItemSelector({ catalogItems, lineItems, onAdd, onRemove, onQuant
                             >
                                 <div>
                                     <p className="text-sm text-white">{item.nombre}</p>
-                                    {item.codigo_sku && <p className="text-xs text-slate-500 font-mono">{item.codigo_sku}</p>}
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        {item.codigo_sku && <span className="text-xs text-slate-500 font-mono">{item.codigo_sku}</span>}
+                                        <span className="text-[10px] uppercase font-semibold text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded">{item.categoria}</span>
+                                    </div>
                                 </div>
                                 <span className="text-sm text-emerald-400 font-medium shrink-0 ml-3">{formatPrice(item.precio_base)}</span>
                             </button>
@@ -113,7 +120,10 @@ export function ItemSelector({ catalogItems, lineItems, onAdd, onRemove, onQuant
                             <div className="hidden sm:grid grid-cols-12 gap-2 items-center px-4 py-3">
                                 <div className="col-span-4">
                                     <p className="text-sm text-white truncate">{line.nombre}</p>
-                                    {line.codigo_sku && <p className="text-xs text-slate-500 font-mono">{line.codigo_sku}</p>}
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        {line.codigo_sku && <span className="text-xs text-slate-500 font-mono">{line.codigo_sku}</span>}
+                                        <span className="text-[10px] uppercase font-bold text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded">{line.categoria} {line.recurrencia ? `/ ${line.recurrencia}` : ''}</span>
+                                    </div>
                                 </div>
                                 <div className="col-span-2 flex justify-center">
                                     <input
@@ -121,7 +131,7 @@ export function ItemSelector({ catalogItems, lineItems, onAdd, onRemove, onQuant
                                         value={line.cantidad}
                                         onChange={e => onQuantityChange(idx, Math.max(1, parseInt(e.target.value) || 1))}
                                         min={1}
-                                        className="w-16 px-2 py-1.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                        className="w-16 px-2 py-1.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all"
                                     />
                                 </div>
                                 <div className="col-span-3">
@@ -133,7 +143,7 @@ export function ItemSelector({ catalogItems, lineItems, onAdd, onRemove, onQuant
                                             onChange={e => onPriceChange(idx, parseFloat(e.target.value) || 0)}
                                             min={0}
                                             step={0.01}
-                                            className="w-full pl-7 pr-2 py-1.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-right focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                            className="w-full pl-7 pr-2 py-1.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-right focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all"
                                         />
                                     </div>
                                 </div>
@@ -178,7 +188,7 @@ export function ItemSelector({ catalogItems, lineItems, onAdd, onRemove, onQuant
                                             value={line.cantidad}
                                             onChange={e => onQuantityChange(idx, Math.max(1, parseInt(e.target.value) || 1))}
                                             min={1}
-                                            className="w-full px-2 py-1.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                            className="w-full px-2 py-1.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all"
                                         />
                                     </div>
                                     <div>
@@ -188,7 +198,7 @@ export function ItemSelector({ catalogItems, lineItems, onAdd, onRemove, onQuant
                                             value={line.precio_unitario}
                                             onChange={e => onPriceChange(idx, parseFloat(e.target.value) || 0)}
                                             min={0}
-                                            className="w-full px-2 py-1.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                            className="w-full px-2 py-1.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all"
                                         />
                                     </div>
                                     <div>
