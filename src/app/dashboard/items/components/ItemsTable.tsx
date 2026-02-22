@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { createItem, updateItem, deleteItem } from '../actions'
+import { useState, useRef } from 'react'
+import Papa from 'papaparse'
+import { createItem, updateItem, deleteItem, importItemsBulk } from '../actions'
 import type { ItemFormData } from '../actions'
 import { ItemModal } from './ItemModal'
 import { DeleteConfirm } from './DeleteConfirm'
@@ -30,6 +31,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
     const [deleteTarget, setDeleteTarget] = useState<Item | null>(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const filteredItems = items.filter(item =>
         item.nombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -104,6 +106,75 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
         setDeleteTarget(null)
     }
 
+    const handleExportCSV = () => {
+        if (items.length === 0) return
+
+        const csvData = items.map(item => ({
+            Nombre: item.nombre,
+            SKU: item.codigo_sku || '',
+            Descripcion: item.descripcion || '',
+            Precio_Base: Math.round(item.precio_base).toString(),
+            Notas_Internas: item.notas_internas || '',
+            Categoria: item.categoria,
+            Recurrencia: item.recurrencia || ''
+        }))
+
+        const csv = Papa.unparse(csvData)
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `catalogo_items_${new Date().toISOString().split('T')[0]}.csv`)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
+
+    const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+
+        setLoading(true)
+        setError(null)
+
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: async (results) => {
+                try {
+                    // Mapear cabeceras en español al formato esperado
+                    const itemsToImport: ItemFormData[] = (results.data as any[]).map(row => ({
+                        nombre: row.Nombre?.trim() || 'Ítem sin nombre',
+                        codigo_sku: row.SKU?.trim() || '',
+                        descripcion: row.Descripcion?.trim() || '',
+                        precio_base: parseFloat(row.Precio_Base) || 0,
+                        notas_internas: row.Notas_Internas?.trim() || '',
+                        categoria: row.Categoria?.trim() || 'Pago único',
+                        recurrencia: row.Recurrencia?.trim() || ''
+                    }))
+
+                    const result = await importItemsBulk(itemsToImport)
+                    if (result.error) {
+                        setError(result.error)
+                    } else {
+                        // Recargar forzosamente para jalar desde Supabase
+                        window.location.reload()
+                    }
+                } catch (e) {
+                    setError('Error al procesar el archivo CSV. Revisa el formato.')
+                } finally {
+                    setLoading(false)
+                    if (fileInputRef.current) fileInputRef.current.value = ''
+                }
+            },
+            error: (err) => {
+                setError(`Error leyendo archivo: ${err.message}`)
+                setLoading(false)
+                if (fileInputRef.current) fileInputRef.current.value = ''
+            }
+        })
+    }
+
     const formatPrice = (price: number) =>
         new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(price)
 
@@ -138,12 +209,43 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                         className="w-full pl-10 pr-4 py-2.5 bg-[#0B0314]/60 border border-white/5 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                     />
                 </div>
-                <button
-                    onClick={openCreate}
-                    className="px-5 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white font-medium rounded-xl hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg shadow-fuchsia-500/25 text-sm whitespace-nowrap cursor-pointer"
-                >
-                    + Nuevo Ítem
-                </button>
+                <div className="flex gap-2">
+                    <input
+                        type="file"
+                        accept=".csv"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleImportCSV}
+                    />
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={loading}
+                        className="px-4 py-2.5 bg-slate-800/50 text-slate-300 font-medium rounded-xl hover:bg-slate-800 transition-all border border-white/5 text-sm cursor-pointer flex items-center gap-2"
+                        title="Importar CSV"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>
+                        <span className="hidden sm:inline">Importar</span>
+                    </button>
+                    <button
+                        onClick={handleExportCSV}
+                        disabled={loading || items.length === 0}
+                        className="px-4 py-2.5 bg-slate-800/50 text-slate-300 font-medium rounded-xl hover:bg-slate-800 transition-all border border-white/5 text-sm cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                        title="Exportar CSV"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                        <span className="hidden sm:inline">Exportar</span>
+                    </button>
+                    <button
+                        onClick={openCreate}
+                        className="px-5 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white font-medium rounded-xl hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg shadow-fuchsia-500/25 text-sm whitespace-nowrap cursor-pointer"
+                    >
+                        + Nuevo Ítem
+                    </button>
+                </div>
             </div>
 
             {/* Content */}

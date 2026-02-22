@@ -85,3 +85,32 @@ export async function deleteItem(id: string) {
     revalidatePath('/dashboard')
     return { error: null }
 }
+
+export async function importItemsBulk(items: ItemFormData[]) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { error: 'No autenticado' }
+
+    // Preparamos los datos con el ID del usuario
+    const rowsToInsert = items.map(item => ({
+        usuario_id: user.id,
+        nombre: item.nombre,
+        codigo_sku: item.codigo_sku || null,
+        descripcion: item.descripcion || null,
+        precio_base: item.precio_base || 0,
+        notas_internas: item.notas_internas || null,
+        categoria: item.categoria || 'Pago único',
+        recurrencia: item.categoria === 'Pago recurrente' ? (item.recurrencia || null) : null,
+    }))
+
+    const { error } = await supabase
+        .from('items')
+        .insert(rowsToInsert)
+
+    if (error) return { error: `Error en inserción masiva: ${error.message}` }
+
+    revalidatePath('/dashboard/items')
+    revalidatePath('/dashboard')
+    return { error: null }
+}
