@@ -63,7 +63,7 @@ export default function KanbanBoard({ initialCotizaciones }: { initialCotizacion
     return (
         <div className="flex gap-6 overflow-x-auto pb-4 snap-x">
             {ESTADOS.map((estado) => (
-                <div key={estado.id} className="flex-none w-80 min-h-[500px] rounded-2xl bg-slate-900/50 border border-slate-800 p-4 snap-start flex flex-col">
+                <div key={estado.id} className="flex-none w-80 min-h-[500px] rounded-2xl bg-[#0B0314]/60 border border-white/5 p-4 snap-start flex flex-col">
                     <div className="flex items-center justify-between mb-4">
                         <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${estado.color}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${estado.dot}`} />
@@ -103,7 +103,7 @@ export default function KanbanBoard({ initialCotizaciones }: { initialCotizacion
                                             value={cot.estado}
                                             onChange={(e) => handleChangeEstado(cot.id, e.target.value)}
                                             disabled={updating === cot.id}
-                                            className="w-full bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-fuchsia-500 disabled:opacity-50"
+                                            className="w-full bg-[#0B0314] border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-fuchsia-500 disabled:opacity-50"
                                         >
                                             {ESTADOS.map(e => (
                                                 <option key={e.id} value={e.id}>{e.label}</option>

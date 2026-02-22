@@ -78,9 +78,9 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl animate-slide-in">
+            <div className="relative w-full max-w-lg bg-[#0B0314] border border-white/5 rounded-2xl shadow-2xl animate-slide-in">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-800">
+                <div className="flex items-center justify-between p-6 border-b border-white/5">
                     <h2 className="text-lg font-semibold text-white">
                         {item ? 'Editar Ítem' : 'Nuevo Ítem'}
                     </h2>

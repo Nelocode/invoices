@@ -22,7 +22,7 @@ export default async function DashboardLayout({
         .single()
 
     return (
-        <div className="flex h-screen bg-slate-950">
+        <div className="flex h-screen bg-transparent">
             <Sidebar
                 userName={profile?.nombre_completo || user.email || 'Usuario'}
                 userCompany={profile?.empresa || ''}

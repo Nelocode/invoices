@@ -12,7 +12,7 @@ export default async function CrearCotizacionPage() {
     return (
         <div>
             <div className="mb-6">
-                <h1 className="text-2xl lg:text-3xl font-bold text-white">Nueva Cotización</h1>
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-purple-600">Nueva Cotización</h1>
                 <p className="text-slate-400 mt-1">Completa los datos para crear tu cotización</p>
             </div>
 

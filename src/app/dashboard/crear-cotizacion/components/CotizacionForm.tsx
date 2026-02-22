@@ -173,7 +173,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
 
     if (success) {
         return (
-            <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-12 text-center">
+            <div className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-12 text-center">
                 <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -200,7 +200,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             )}
 
             {/* 1. Datos del cliente */}
-            <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
+            <section className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -236,7 +236,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             </section>
 
             {/* 2. Ítems de la cotización */}
-            <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
+            <section className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
@@ -260,7 +260,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             </section>
 
             {/* 3. Resumen financiero */}
-            <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
+            <section className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
@@ -295,7 +295,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
                             <span className="text-white font-medium ml-2">{formatPrice(impuestos)}</span>
                         </div>
                     </div>
-                    <div className="border-t border-slate-800 pt-3 flex items-center justify-between">
+                    <div className="border-t border-white/5 pt-3 flex items-center justify-between">
                         <span className="text-white font-semibold">Total</span>
                         <span className="text-xl font-bold text-emerald-400">{formatPrice(total)}</span>
                     </div>
@@ -303,7 +303,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             </section>
 
             {/* 4. Secciones opcionales con toggles */}
-            <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 space-y-5">
+            <section className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 space-y-5">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                     <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
@@ -373,7 +373,7 @@ export function CotizacionForm({ catalogItems }: CotizacionFormProps) {
             </section>
 
             {/* 5. Firma */}
-            <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
+            <section className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <svg className="w-5 h-5 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />

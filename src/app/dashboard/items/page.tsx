@@ -12,8 +12,8 @@ export default async function ItemsPage() {
     return (
         <div>
             <div className="mb-6">
-                <h1 className="text-2xl lg:text-3xl font-bold text-white">Catálogo de Ítems</h1>
-                <p className="text-slate-400 mt-1">Gestiona tus productos y servicios</p>
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-purple-600">Catálogo de Ítems</h1>
+                <p className="text-slate-400 mt-1">Gestiona los productos y servicios que ofreces</p>
             </div>
 
             <ItemsTable initialItems={items || []} />

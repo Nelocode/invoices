@@ -73,7 +73,7 @@ export function Sidebar({ userName, userCompany, userEmail, userLogo }: SidebarP
     const sidebarContent = (
         <>
             {/* Logo */}
-            <div className="p-6 border-b border-slate-800">
+            <div className="p-6 border-b border-white/5">
                 <div className="flex flex-col items-center gap-2">
                     {userLogo ? (
                         <div className="w-full h-12 flex items-center justify-center">
@@ -109,7 +109,7 @@ export function Sidebar({ userName, userCompany, userEmail, userLogo }: SidebarP
             </nav>
 
             {/* Perfil + Logout */}
-            <div className="p-4 border-t border-slate-800">
+            <div className="p-4 border-t border-white/5">
                 <div className="flex items-center gap-3 px-4 py-3 mb-2">
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
                         {userName.charAt(0).toUpperCase()}
@@ -140,7 +140,7 @@ export function Sidebar({ userName, userCompany, userEmail, userLogo }: SidebarP
             <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white cursor-pointer"
+                className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl bg-[#0B0314]/80 backdrop-blur-md border border-fuchsia-500/10 text-slate-400 hover:text-white cursor-pointer"
             >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -148,7 +148,7 @@ export function Sidebar({ userName, userCompany, userEmail, userLogo }: SidebarP
             </button>
 
             {/* Sidebar desktop */}
-            <aside className="hidden lg:flex lg:flex-col w-72 bg-slate-900/50 backdrop-blur-xl border-r border-slate-800 h-screen">
+            <aside className="hidden lg:flex lg:flex-col w-72 bg-[#0B0314]/60 backdrop-blur-2xl border-r border-fuchsia-500/10 h-screen">
                 {sidebarContent}
             </aside>
 
@@ -159,7 +159,7 @@ export function Sidebar({ userName, userCompany, userEmail, userLogo }: SidebarP
                         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                         onClick={() => setMobileOpen(false)}
                     />
-                    <aside className="relative w-72 h-full bg-slate-900 border-r border-slate-800 flex flex-col animate-slide-in">
+                    <aside className="relative w-72 h-full bg-[#0B0314] border-r border-fuchsia-500/10 flex flex-col animate-slide-in shadow-[4px_0_24px_rgba(217,70,239,0.05)]">
                         <button
                             type="button"
                             onClick={() => setMobileOpen(false)}

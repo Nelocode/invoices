@@ -22,7 +22,7 @@ export default async function DashboardPage() {
         <div>
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-2xl lg:text-3xl font-bold text-white">
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-purple-600">
                     ¡Hola, {profile?.nombre_completo?.split(' ')[0] || 'Usuario'}! 👋
                 </h1>
                 <p className="text-slate-400 mt-1">
@@ -33,7 +33,7 @@ export default async function DashboardPage() {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 {/* Items */}
-                <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 hover:border-fuchsia-500/30 transition-all duration-300">
+                <div className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 hover:border-fuchsia-500/30 transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-12 h-12 rounded-xl bg-fuchsia-500/10 flex items-center justify-center">
                             <svg className="w-6 h-6 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
                 </div>
 
                 {/* Cotizaciones */}
-                <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 hover:border-purple-500/30 transition-all duration-300">
+                <div className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 hover:border-purple-500/30 transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
                             <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -59,7 +59,7 @@ export default async function DashboardPage() {
                 </div>
 
                 {/* Empresa */}
-                <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/30 transition-all duration-300">
+                <div className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 hover:border-emerald-500/30 transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                             <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
+            <div className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4">Acciones rápidas</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <a

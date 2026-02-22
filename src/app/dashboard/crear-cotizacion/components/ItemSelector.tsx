@@ -104,9 +104,9 @@ export function ItemSelector({ catalogItems, lineItems, onAdd, onRemove, onQuant
 
             {/* Líneas de detalle */}
             {lineItems.length > 0 && (
-                <div className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
+                <div className="bg-[#0B0314]/60 border border-white/5 rounded-xl overflow-hidden">
                     {/* Header desktop */}
-                    <div className="hidden sm:grid grid-cols-12 gap-2 px-4 py-3 border-b border-slate-800 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    <div className="hidden sm:grid grid-cols-12 gap-2 px-4 py-3 border-b border-white/5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                         <div className="col-span-4">Ítem</div>
                         <div className="col-span-2 text-center">Cant.</div>
                         <div className="col-span-3 text-right">Precio Unit.</div>
@@ -115,14 +115,14 @@ export function ItemSelector({ catalogItems, lineItems, onAdd, onRemove, onQuant
                     </div>
 
                     {lineItems.map((line, idx) => (
-                        <div key={line.item_id} className="border-b border-slate-800/50 last:border-0">
+                        <div key={line.item_id} className="border-b border-white/5/50 last:border-0">
                             {/* Desktop */}
                             <div className="hidden sm:grid grid-cols-12 gap-2 items-center px-4 py-3">
                                 <div className="col-span-4">
                                     <p className="text-sm text-white truncate">{line.nombre}</p>
                                     <div className="flex items-center gap-2 mt-0.5">
                                         {line.codigo_sku && <span className="text-xs text-slate-500 font-mono">{line.codigo_sku}</span>}
-                                        <span className="text-[10px] uppercase font-bold text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded">{line.categoria} {line.recurrencia ? `/ ${line.recurrencia}` : ''}</span>
+                                        <span className="text-[10px] uppercase font-bold text-slate-400 bg-[#0B0314] px-1.5 py-0.5 rounded">{line.categoria} {line.recurrencia ? `/ ${line.recurrencia}` : ''}</span>
                                     </div>
                                 </div>
                                 <div className="col-span-2 flex justify-center">

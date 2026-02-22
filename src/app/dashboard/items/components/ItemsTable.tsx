@@ -135,7 +135,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder="Buscar por nombre, SKU o descripción..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-[#0B0314]/60 border border-white/5 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                     />
                 </div>
                 <button
@@ -148,7 +148,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
 
             {/* Content */}
             {filteredItems.length === 0 ? (
-                <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-12 text-center">
+                <div className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-12 text-center">
                     <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto mb-4">
                         <svg className="w-8 h-8 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
@@ -174,10 +174,10 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
             ) : (
                 <>
                     {/* Desktop Table */}
-                    <div className="hidden md:block bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl overflow-hidden">
+                    <div className="hidden md:block bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b border-slate-800">
+                                <tr className="border-b border-white/5">
                                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Ítem</th>
                                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">SKU</th>
                                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Categoría</th>
@@ -249,7 +249,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                     {/* Mobile Cards */}
                     <div className="md:hidden space-y-3">
                         {filteredItems.map(item => (
-                            <div key={item.id} className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl p-4">
+                            <div key={item.id} className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-xl p-4">
                                 <div className="flex items-start justify-between mb-2">
                                     <div className="min-w-0 flex-1">
                                         <p className="text-sm font-medium text-white truncate">{item.nombre}</p>
@@ -268,7 +268,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                                 {item.descripcion && (
                                     <p className="text-xs text-slate-500 mb-3 line-clamp-2">{item.descripcion}</p>
                                 )}
-                                <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+                                <div className="flex items-center justify-between pt-2 border-t border-white/5">
                                     <span className="text-xs text-slate-500">{formatDate(item.creado_en)}</span>
                                     <div className="flex gap-1">
                                         <button
