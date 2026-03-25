@@ -27,17 +27,16 @@ export interface CotizacionFormData {
     empresa_id?: string | null
 }
 
-export async function saveCotizacion(data: CotizacionFormData) {
+export async function updateCotizacion(id: string, data: CotizacionFormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) return { error: 'No autenticado', id: null }
 
-    // 1. Insertar la cotización
-    const { data: cotizacion, error: cotError } = await supabase
+    // 1. Actualizar la cotización
+    const { error: cotError } = await supabase
         .from('cotizaciones')
-        .insert({
-            usuario_id: user.id,
+        .update({
             tipo_documento: data.tipo_documento,
             cliente_nombre: data.cliente_nombre,
             cliente_email: data.cliente_email || null,
@@ -50,18 +49,24 @@ export async function saveCotizacion(data: CotizacionFormData) {
             texto_anexos: data.texto_anexos,
             mostrar_anexos: data.mostrar_anexos,
             firma_url: data.firma_url,
-            estado: 'En proceso',
             empresa_id: data.empresa_id || null,
         })
-        .select('id')
-        .single()
+        .eq('id', id)
 
     if (cotError) return { error: cotError.message, id: null }
 
-    // 2. Insertar las líneas de detalle
+    // 2. Eliminar líneas de detalle anteriores
+    const { error: delError } = await supabase
+        .from('cotizacion_items')
+        .delete()
+        .eq('cotizacion_id', id)
+
+    if (delError) return { error: delError.message, id }
+
+    // 3. Insertar las nuevas líneas de detalle
     if (data.items.length > 0) {
         const lineItems = data.items.map(item => ({
-            cotizacion_id: cotizacion.id,
+            cotizacion_id: id,
             item_id: item.item_id,
             cantidad: item.cantidad,
             precio_unitario: item.precio_unitario,
@@ -72,12 +77,12 @@ export async function saveCotizacion(data: CotizacionFormData) {
             .from('cotizacion_items')
             .insert(lineItems)
 
-        if (lineError) return { error: lineError.message, id: cotizacion.id }
+        if (lineError) return { error: lineError.message, id }
     }
 
     revalidatePath('/dashboard')
-    revalidatePath('/dashboard/crear-cotizacion')
-    return { error: null, id: cotizacion.id }
+    revalidatePath(`/dashboard/editar-cotizacion/${id}`)
+    return { error: null, id }
 }
 
 export async function uploadFirma(formData: FormData) {

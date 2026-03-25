@@ -33,26 +33,22 @@ export function AICotizar({ catalogItems, onResult }: AICotizarProps) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [warnings, setWarnings] = useState<string[]>([])
-    const [file, setFile] = useState<File | null>(null)
 
     async function handleSubmit() {
-        if (!mensaje.trim() && !file) return
+        if (!mensaje.trim()) return
 
         setLoading(true)
         setError(null)
         setWarnings([])
 
         try {
-            const formData = new FormData()
-            formData.append('mensaje', mensaje.trim())
-            formData.append('catalogo', JSON.stringify(catalogItems))
-            if (file) {
-                formData.append('documento', file)
-            }
-
             const res = await fetch('/api/ai-cotizar', {
                 method: 'POST',
-                body: formData,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mensaje: mensaje.trim(),
+                    catalogo: catalogItems,
+                }),
             })
 
             const data = await res.json()
@@ -70,18 +66,11 @@ export function AICotizar({ catalogItems, onResult }: AICotizarProps) {
 
             onResult(data)
             setMensaje('')
-            setFile(null)
             setOpen(false)
         } catch {
             setError('Error de conexión. Intenta de nuevo.')
         } finally {
             setLoading(false)
-        }
-    }
-
-    function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-        if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0])
         }
     }
 
@@ -122,7 +111,7 @@ export function AICotizar({ catalogItems, onResult }: AICotizarProps) {
                 </h3>
                 <button
                     type="button"
-                    onClick={() => { setOpen(false); setError(null); setWarnings([]); setFile(null); }}
+                    onClick={() => { setOpen(false); setError(null); setWarnings([]) }}
                     className="text-slate-400 hover:text-white transition-colors cursor-pointer"
                 >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -147,25 +136,8 @@ export function AICotizar({ catalogItems, onResult }: AICotizarProps) {
                     disabled={loading}
                 />
                 <p className="text-xs mt-1.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                    Describe la solicitud o adjunta un documento (PDF, Imágenes o Texto) para extraer ítems y relacionarlos al catálogo.
+                    Describe la cotización en lenguaje natural. La IA la mapeará a tu catálogo automáticamente.
                 </p>
-
-                {file && (
-                    <div className="mt-3 flex items-center justify-between bg-slate-800/80 px-3 py-2 rounded-lg border border-slate-700/50">
-                        <div className="flex items-center gap-2 overflow-hidden">
-                            <svg className="w-4 h-4 text-purple-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm3.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                            </svg>
-                            <span className="text-xs text-slate-300 truncate">{file.name}</span>
-                        </div>
-                        <button type="button" onClick={() => setFile(null)} className="text-slate-500 hover:text-red-400 p-1 shrink-0 cursor-pointer">
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                )}
             </div>
 
             {error && (
@@ -183,19 +155,11 @@ export function AICotizar({ catalogItems, onResult }: AICotizarProps) {
                 </div>
             )}
 
-            <div className="flex justify-between items-center">
-                <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-300 text-sm font-medium transition-colors">
-                    <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
-                    </svg>
-                    <span>Adjuntar Adjunto</span>
-                    <input type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.txt" />
-                </label>
-
+            <div className="flex justify-end">
                 <button
                     type="button"
                     onClick={handleSubmit}
-                    disabled={loading || (!mensaje.trim() && !file)}
+                    disabled={loading || !mensaje.trim()}
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                         background: loading ? 'rgba(139,92,246,0.3)' : 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',

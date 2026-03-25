@@ -21,9 +21,10 @@ interface Item {
 
 interface ItemsTableProps {
     initialItems: Item[]
+    empresaId?: string | null
 }
 
-export function ItemsTable({ initialItems }: ItemsTableProps) {
+export function ItemsTable({ initialItems, empresaId }: ItemsTableProps) {
     const [items, setItems] = useState<Item[]>(initialItems)
     const [search, setSearch] = useState('')
     const [modalOpen, setModalOpen] = useState(false)
@@ -57,7 +58,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
 
         try {
             if (editingItem) {
-                const result = await updateItem(editingItem.id, data)
+                const result = await updateItem(editingItem.id, { ...data, empresa_id: empresaId || null })
                 if (result.error) {
                     setError(result.error)
                     setLoading(false)
@@ -69,7 +70,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                         : i
                 ))
             } else {
-                const result = await createItem(data)
+                const result = await createItem({ ...data, empresa_id: empresaId || null })
                 if (result.error) {
                     setError(result.error)
                     setLoading(false)
@@ -150,7 +151,8 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                         precio_base: parseFloat(row.Precio_Base) || 0,
                         notas_internas: row.Notas_Internas?.trim() || '',
                         categoria: row.Categoria?.trim() || 'Pago único',
-                        recurrencia: row.Recurrencia?.trim() || ''
+                        recurrencia: row.Recurrencia?.trim() || '',
+                        empresa_id: empresaId || null
                     }))
 
                     const result = await importItemsBulk(itemsToImport)
@@ -219,8 +221,8 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                     />
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={loading}
-                        className="px-4 py-2.5 bg-slate-800/50 text-slate-300 font-medium rounded-xl hover:bg-slate-800 transition-all border border-white/5 text-sm cursor-pointer flex items-center gap-2"
+                        disabled={loading || !empresaId}
+                        className="px-4 py-2.5 bg-slate-800/50 text-slate-300 font-medium rounded-xl hover:bg-slate-800 transition-all border border-white/5 text-sm cursor-pointer flex items-center gap-2 disabled:opacity-50"
                         title="Importar CSV"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -230,7 +232,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                     </button>
                     <button
                         onClick={handleExportCSV}
-                        disabled={loading || items.length === 0}
+                        disabled={loading || items.length === 0 || !empresaId}
                         className="px-4 py-2.5 bg-slate-800/50 text-slate-300 font-medium rounded-xl hover:bg-slate-800 transition-all border border-white/5 text-sm cursor-pointer flex items-center gap-2 disabled:opacity-50"
                         title="Exportar CSV"
                     >
@@ -241,7 +243,8 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                     </button>
                     <button
                         onClick={openCreate}
-                        className="px-5 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white font-medium rounded-xl hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg shadow-fuchsia-500/25 text-sm whitespace-nowrap cursor-pointer"
+                        disabled={!empresaId}
+                        className="px-5 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white font-medium rounded-xl hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg shadow-fuchsia-500/25 text-sm whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         + Nuevo Ítem
                     </button>
@@ -249,7 +252,17 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
             </div>
 
             {/* Content */}
-            {filteredItems.length === 0 ? (
+            {!empresaId ? (
+                <div className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-12 text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Debes unirte a una Empresa</h3>
+                    <p className="text-slate-400 text-sm mb-6">Ve a tu perfil para unirte a un espacio de trabajo o crear uno nuevo antes de subir ítems.</p>
+                </div>
+            ) : filteredItems.length === 0 ? (
                 <div className="bg-[#0B0314]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-12 text-center">
                     <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto mb-4">
                         <svg className="w-8 h-8 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

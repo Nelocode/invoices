@@ -16,9 +16,12 @@
     "next": "16.1.6",
     "openai": "^6.22.0",
     "papaparse": "^5.5.3",
+    "pdf-parse": "^2.4.5",
+    "pdf2json": "^4.0.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "resend": "^6.9.2"
+    "resend": "^6.9.2",
+    "supabase": "^2.76.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

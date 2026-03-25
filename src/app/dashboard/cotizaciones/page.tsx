@@ -5,17 +5,46 @@ import KanbanBoard from './KanbanBoard'
 export default async function CotizacionesPage() {
     const supabase = await createClient()
 
-    const { data: cotizaciones } = await supabase
-        .from('cotizaciones')
-        .select('id, cliente_nombre, cliente_email, total, estado, creado_en')
-        .order('creado_en', { ascending: false })
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return <div>No autorizado</div>
+    }
+
+    const { data: profile } = await supabase
+        .from('usuarios')
+        .select('empresa_id')
+        .eq('id', user.id)
+        .single()
+
+    const empresaId = profile?.empresa_id
+
+    let cotizaciones = []
+
+    if (empresaId) {
+        const { data } = await supabase
+            .from('cotizaciones')
+            .select('id, cliente_nombre, cliente_email, total, estado, creado_en, tipo_documento')
+            .eq('empresa_id', empresaId)
+            .order('creado_en', { ascending: false })
+
+        cotizaciones = data || []
+    } else {
+        const { data } = await supabase
+            .from('cotizaciones')
+            .select('id, cliente_nombre, cliente_email, total, estado, creado_en, tipo_documento')
+            .eq('usuario_id', user.id)
+            .order('creado_en', { ascending: false })
+
+        cotizaciones = data || []
+    }
 
     return (
         <div className="h-[calc(100vh-8rem)] flex flex-col">
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4 shrink-0">
                 <div>
-                    <h1 className="text-2xl lg:text-3xl font-bold text-white">Cotizaciones (Pipeline)</h1>
-                    <p className="text-white/50 mt-1">Gestiona el estado de tus cotizaciones</p>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white">Documentos (Pipeline)</h1>
+                    <p className="text-white/50 mt-1">Gestiona el estado de tus cotizaciones, proformas y cobros</p>
                 </div>
                 <Link
                     href="/dashboard/crear-cotizacion"

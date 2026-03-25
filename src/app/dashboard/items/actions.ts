@@ -11,6 +11,7 @@ export interface ItemFormData {
     notas_internas: string
     categoria: string
     recurrencia?: string
+    empresa_id?: string | null
 }
 
 export async function getItems() {
@@ -39,6 +40,7 @@ export async function createItem(formData: ItemFormData) {
         notas_internas: formData.notas_internas || null,
         categoria: formData.categoria || 'Pago único',
         recurrencia: formData.categoria === 'Pago recurrente' ? formData.recurrencia : null,
+        empresa_id: formData.empresa_id || null,
     })
 
     if (error) return { error: error.message }
@@ -61,6 +63,7 @@ export async function updateItem(id: string, formData: ItemFormData) {
             notas_internas: formData.notas_internas || null,
             categoria: formData.categoria || 'Pago único',
             recurrencia: formData.categoria === 'Pago recurrente' ? formData.recurrencia : null,
+            empresa_id: formData.empresa_id || null,
         })
         .eq('id', id)
 
@@ -102,6 +105,7 @@ export async function importItemsBulk(items: ItemFormData[]) {
         notas_internas: item.notas_internas || null,
         categoria: item.categoria || 'Pago único',
         recurrencia: item.categoria === 'Pago recurrente' ? (item.recurrencia || null) : null,
+        empresa_id: item.empresa_id || null,
     }))
 
     const { error } = await supabase

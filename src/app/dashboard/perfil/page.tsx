@@ -10,9 +10,25 @@ export default async function PerfilPage() {
 
     const { data: profile } = await supabase
         .from('usuarios')
-        .select('nombre_completo, empresa, telefono, logo_url')
+        .select('nombre_completo, empresa, telefono, logo_url, info_bancaria, link_pago, empresa_id, rol')
         .eq('id', user.id)
         .single()
+
+    let userEmpresa = null
+    if (profile?.empresa_id) {
+        const { data: empresaData } = await supabase
+            .from('empresas')
+            .select('id, nombre, clave_acceso')
+            .eq('id', profile.empresa_id)
+            .single()
+
+        if (empresaData) {
+            userEmpresa = {
+                ...empresaData,
+                rol: profile.rol
+            }
+        }
+    }
 
     return (
         <div>
@@ -26,6 +42,9 @@ export default async function PerfilPage() {
                 userName={profile?.nombre_completo || user.email || 'Usuario'}
                 userCompany={profile?.empresa || null}
                 userEmail={user.email || ''}
+                initialBankInfo={profile?.info_bancaria || null}
+                initialPaymentLink={profile?.link_pago || null}
+                userEmpresa={userEmpresa}
             />
         </div>
     )

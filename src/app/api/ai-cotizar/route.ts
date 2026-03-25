@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import PDFParser from 'pdf2json'
 import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
@@ -15,10 +16,63 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
         }
 
-        const { mensaje, catalogo } = await request.json()
+        const formData = await request.formData()
+        const mensajeRaw = formData.get('mensaje') as string || ''
+        const catalogoStr = formData.get('catalogo') as string
+        const file = formData.get('documento') as File | null
 
-        if (!mensaje || !catalogo || !Array.isArray(catalogo)) {
-            return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 })
+        if (!catalogoStr) {
+            return NextResponse.json({ error: 'Catálogo no proporcionado' }, { status: 400 })
+        }
+
+        let catalogo: any[] = []
+        try {
+            catalogo = JSON.parse(catalogoStr)
+        } catch {
+            return NextResponse.json({ error: 'Catálogo inválido' }, { status: 400 })
+        }
+
+        if (!Array.isArray(catalogo)) {
+            return NextResponse.json({ error: 'Datos de catálogo inválidos' }, { status: 400 })
+        }
+
+        let extraText = ''
+        let imageUrl: string | null = null
+
+        if (file) {
+            const bytes = await file.arrayBuffer()
+            const buffer = Buffer.from(bytes)
+
+            if (file.type === 'application/pdf') {
+                try {
+                    const text = await new Promise<string>((resolve, reject) => {
+                        const pdfParser = new PDFParser(null, true)
+                        pdfParser.on("pdfParser_dataError", (errData: any) => reject(errData.parserError))
+                        pdfParser.on("pdfParser_dataReady", () => {
+                            resolve(pdfParser.getRawTextContent())
+                        })
+                        pdfParser.parseBuffer(buffer)
+                    })
+
+                    extraText = `\n\nCONTENIDO DEL DOCUMENTO ADJUNTO:\n${text}`
+                } catch (err) {
+                    console.error('Error parseando PDF', err)
+                    return NextResponse.json({ error: 'No se pudo leer el archivo PDF' }, { status: 400 })
+                }
+            } else if (file.type === 'text/plain') {
+                extraText = `\n\nCONTENIDO DEL DOCUMENTO ADJUNTO:\n${buffer.toString('utf-8')}`
+            } else if (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg') {
+                const base64 = buffer.toString('base64')
+                imageUrl = `data:${file.type};base64,${base64}`
+            } else {
+                return NextResponse.json({ error: 'Tipo de archivo no soportado. Usa PDF, Imágenes o Texto.' }, { status: 400 })
+            }
+        }
+
+        const finalMessage = mensajeRaw + extraText
+
+        if (!finalMessage.trim() && !imageUrl) {
+            return NextResponse.json({ error: 'No se proporcionó mensaje ni documento válido' }, { status: 400 })
         }
 
         // Construir la lista del catálogo para el prompt
@@ -63,7 +117,12 @@ DEBES responder ÚNICAMENTE con un JSON válido, sin markdown, sin texto adicion
                 },
                 {
                     role: 'user',
-                    content: mensaje
+                    content: imageUrl
+                        ? [
+                            { type: 'text', text: finalMessage.trim() || 'Extrae los elementos de la imagen y relacionalos con el catálogo.' },
+                            { type: 'image_url', image_url: { url: imageUrl } }
+                        ]
+                        : finalMessage
                 }
             ]
         })

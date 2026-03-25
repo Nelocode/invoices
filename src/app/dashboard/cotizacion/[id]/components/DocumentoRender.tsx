@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { DescargarPDFButton } from './DescargarPDFButton'
 import { convertirDocumento } from '../actions'
 import { useRouter } from 'next/navigation'
+import { EnviarPDFModal } from './EnviarPDFModal'
 
 interface LineItem {
     nombre: string
@@ -32,7 +33,11 @@ export interface CotizacionData {
     usuario_empresa: string | null
     usuario_email: string
     usuario_logo_url: string | null
+    info_bancaria: string | null
+    link_pago: string | null
     tipo_documento: string
+    texto_anexos: string | null
+    mostrar_anexos: boolean
     items: LineItem[]
 }
 
@@ -40,6 +45,7 @@ export function DocumentoRender({ data }: { data: CotizacionData }) {
     const docRef = useRef<HTMLDivElement>(null)
     const router = useRouter()
     const [isConverting, setIsConverting] = useState(false)
+    const [showEmailModal, setShowEmailModal] = useState(false)
 
     const handleConvert = async (tipo: 'cuenta_cobro' | 'factura_proforma') => {
         setIsConverting(true)
@@ -104,6 +110,16 @@ export function DocumentoRender({ data }: { data: CotizacionData }) {
                             </div>
                         </div>
                     )}
+
+                    <button
+                        onClick={() => setShowEmailModal(true)}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all cursor-pointer bg-white text-slate-900 border border-slate-200 shadow-sm hover:bg-slate-50 hover:text-indigo-600"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg>
+                        Enviar Email
+                    </button>
 
                     <DescargarPDFButton targetRef={docRef} cotizacionId={cotNumber} />
                 </div>
@@ -567,54 +583,63 @@ export function DocumentoRender({ data }: { data: CotizacionData }) {
                         gap: '40px',
                     }}>
                         {/* Datos bancarios */}
-                        <div style={{ flex: 1 }}>
-                            <div style={{
-                                fontSize: '9px',
-                                fontWeight: 700,
-                                letterSpacing: '0.1em',
-                                textTransform: 'uppercase',
-                                color: '#fc7ebf',
-                                marginBottom: '10px',
-                            }}>
-                                DATOS BANCARIOS
-                            </div>
-                            <div style={{ fontSize: '11px', lineHeight: 1.8, color: 'rgba(255,255,255,0.5)' }}>
-                                <div><span style={{ color: 'rgba(255,255,255,0.7)' }}>Banco:</span> Bancolombia</div>
-                                <div><span style={{ color: 'rgba(255,255,255,0.7)' }}>Cuenta:</span> Ahorros 123-456789-00</div>
-                                <div><span style={{ color: 'rgba(255,255,255,0.7)' }}>Titular:</span> Brainware SAS</div>
-                                <div><span style={{ color: 'rgba(255,255,255,0.7)' }}>NIT:</span> 900.000.000-0</div>
-                            </div>
-                        </div>
-                        {/* Links de pago */}
-                        <div style={{ flex: 1 }}>
-                            <div style={{
-                                fontSize: '9px',
-                                fontWeight: 700,
-                                letterSpacing: '0.1em',
-                                textTransform: 'uppercase',
-                                color: '#fc7ebf',
-                                marginBottom: '10px',
-                            }}>
-                                PAGO EN LÍNEA
-                            </div>
-                            <div style={{ fontSize: '11px', lineHeight: 1.8, color: 'rgba(255,255,255,0.5)' }}>
-                                <div>Link de pago disponible próximamente</div>
-                                <div style={{ marginTop: '6px' }}>
-                                    <span style={{
-                                        display: 'inline-block',
-                                        padding: '4px 12px',
-                                        background: 'rgba(252,126,191,0.1)',
-                                        border: '1px solid rgba(252,126,191,0.2)',
-                                        borderRadius: '6px',
-                                        fontSize: '10px',
-                                        color: '#fc7ebf',
-                                        fontWeight: 600,
-                                    }}>
-                                        wompi.co / paypal.me
-                                    </span>
+                        {data.info_bancaria ? (
+                            <div style={{ flex: 1 }}>
+                                <div style={{
+                                    fontSize: '9px',
+                                    fontWeight: 700,
+                                    letterSpacing: '0.1em',
+                                    textTransform: 'uppercase',
+                                    color: '#fc7ebf',
+                                    marginBottom: '10px',
+                                }}>
+                                    DATOS BANCARIOS
+                                </div>
+                                <div style={{ fontSize: '11px', lineHeight: 1.8, color: 'rgba(255,255,255,0.5)', whiteSpace: 'pre-wrap' }}>
+                                    {data.info_bancaria}
                                 </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div style={{ flex: 1 }} />
+                        )}
+
+                        {/* Links de pago */}
+                        {data.link_pago ? (
+                            <div style={{ flex: 1 }}>
+                                <div style={{
+                                    fontSize: '9px',
+                                    fontWeight: 700,
+                                    letterSpacing: '0.1em',
+                                    textTransform: 'uppercase',
+                                    color: '#fc7ebf',
+                                    marginBottom: '10px',
+                                }}>
+                                    PAGO EN LÍNEA
+                                </div>
+                                <div style={{ fontSize: '11px', lineHeight: 1.8, color: 'rgba(255,255,255,0.5)' }}>
+                                    <div style={{ marginTop: '6px' }}>
+                                        <a href={data.link_pago} target="_blank" rel="noopener noreferrer" style={{
+                                            display: 'inline-block',
+                                            padding: '4px 12px',
+                                            background: 'rgba(252,126,191,0.1)',
+                                            border: '1px solid rgba(252,126,191,0.2)',
+                                            borderRadius: '6px',
+                                            fontSize: '10px',
+                                            color: '#fc7ebf',
+                                            fontWeight: 600,
+                                            textDecoration: 'none'
+                                        }}>
+                                            Pagar en Línea
+                                        </a>
+                                        <div style={{ marginTop: '4px', fontSize: '9px', color: 'rgba(255,255,255,0.4)', wordBreak: 'break-all' }}>
+                                            {data.link_pago}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div style={{ flex: 1 }} />
+                        )}
                     </div>
 
                     {/* Pie con branding */}
@@ -631,6 +656,68 @@ export function DocumentoRender({ data }: { data: CotizacionData }) {
                     </div>
                 </div>
             </div>
+
+            {/* ========== PÁGINA 2: ANEXOS (Si aplica) ========== */}
+            {data.mostrar_anexos && data.texto_anexos && (
+                <div
+                    style={{
+                        width: '794px',
+                        minHeight: '1123px',
+                        margin: '24px auto 0 auto',
+                        background: '#090117',
+                        color: '#ffffff',
+                        fontFamily: 'Geist, system-ui, -apple-system, sans-serif',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        padding: '48px',
+                        pageBreakBefore: 'always'
+                    }}
+                >
+                    {/* Header Anexos */}
+                    <div style={{
+                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                        paddingBottom: '24px',
+                        marginBottom: '32px'
+                    }}>
+                        <div style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            letterSpacing: '0.1em',
+                            textTransform: 'uppercase',
+                            color: '#fc7ebf',
+                            marginBottom: '4px',
+                        }}>
+                            DOCUMENTO ANEXO
+                        </div>
+                        <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.02em' }}>
+                            Detalles y Especificaciones
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginTop: '4px' }}>
+                            Ref: #{cotNumber}
+                        </div>
+                    </div>
+
+                    {/* Contenido Anexos */}
+                    <div style={{
+                        fontSize: '12px',
+                        lineHeight: 1.8,
+                        color: 'rgba(255,255,255,0.85)',
+                        whiteSpace: 'pre-wrap'
+                    }}>
+                        {data.texto_anexos}
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL DE ENVIO POR EMAIL */}
+            {showEmailModal && (
+                <EnviarPDFModal
+                    targetRef={docRef}
+                    cotizacionId={data.id}
+                    clienteEmail={data.cliente_email}
+                    onClose={() => setShowEmailModal(false)}
+                />
+            )}
         </div>
     )
 }

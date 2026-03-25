@@ -4,10 +4,30 @@ import { ItemsTable } from './components/ItemsTable'
 export default async function ItemsPage() {
     const supabase = await createClient()
 
-    const { data: items } = await supabase
-        .from('items')
-        .select('*')
-        .order('creado_en', { ascending: false })
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return <div>No autorizado</div>
+    }
+
+    const { data: profile } = await supabase
+        .from('usuarios')
+        .select('empresa_id')
+        .eq('id', user.id)
+        .single()
+
+    const empresaId = profile?.empresa_id
+
+    let items = []
+    if (empresaId) {
+        const { data } = await supabase
+            .from('items')
+            .select('*')
+            .eq('empresa_id', empresaId)
+            .order('creado_en', { ascending: false })
+
+        items = data || []
+    }
 
     return (
         <div>
@@ -16,7 +36,7 @@ export default async function ItemsPage() {
                 <p className="text-slate-400 mt-1">Gestiona los productos y servicios que ofreces</p>
             </div>
 
-            <ItemsTable initialItems={items || []} />
+            <ItemsTable initialItems={items || []} empresaId={empresaId} />
         </div>
     )
 }

@@ -11,6 +11,7 @@ type Cotizacion = {
     total: number
     estado: string
     creado_en: string
+    tipo_documento: string
 }
 
 const ESTADOS = [
@@ -90,7 +91,10 @@ export default function KanbanBoard({ initialCotizaciones }: { initialCotizacion
                                             {cot.cliente_nombre}
                                         </div>
                                         <div className="text-xs text-slate-400 flex justify-between">
-                                            <span>#{cot.id.slice(0, 8).toUpperCase()}</span>
+                                            <span>
+                                                {cot.tipo_documento === 'cuenta_cobro' ? 'CTA. COBRO ' : cot.tipo_documento === 'factura_proforma' ? 'PROFORMA ' : 'COT. '}
+                                                #{cot.id.slice(0, 8).toUpperCase()}
+                                            </span>
                                             <span>{formatDate(cot.creado_en)}</span>
                                         </div>
                                         <div className="mt-2 text-sm font-bold text-white">

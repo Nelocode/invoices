@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { saveCotizacion } from '../actions'
+import { updateCotizacion } from '../actions'
 import { ItemSelector, type LineItem } from './ItemSelector'
 import { FirmaUpload } from './FirmaUpload'
 import { AICotizar } from './AICotizar'
@@ -22,40 +22,47 @@ interface CotizacionFormProps {
     catalogItems: CatalogItem[]
     clientes: Cliente[]
     empresaId?: string | null
+    initialData?: any
 }
 
-export function CotizacionForm({ catalogItems, clientes, empresaId }: CotizacionFormProps) {
+export function CotizacionForm({ catalogItems, clientes, empresaId, initialData }: CotizacionFormProps) {
     const router = useRouter()
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
 
     // Datos del cliente
-    const [clienteNombre, setClienteNombre] = useState('')
-    const [clienteEmail, setClienteEmail] = useState('')
+    const [clienteNombre, setClienteNombre] = useState(initialData?.cliente_nombre || '')
+    const [clienteEmail, setClienteEmail] = useState(initialData?.cliente_email || '')
 
     // Configuración del documento
-    const [tipoDocumento, setTipoDocumento] = useState('cotizacion')
+    const [tipoDocumento, setTipoDocumento] = useState(initialData?.tipo_documento || 'cotizacion')
 
     // Líneas de ítems
-    const [lineItems, setLineItems] = useState<LineItem[]>([])
+    const [lineItems, setLineItems] = useState<LineItem[]>(initialData?.items || [])
 
-    // Tax
-    const [taxPercent, setTaxPercent] = useState(0)
+    // Cálculo inicial de taxPercent basado en subtotal e impuestos de initialData
+    // Si initialData.subtotal es 0 o null, taxPercent es 0. 
+    // Si no, taxPercent es (impuestos / subtotal) * 100
+    const initialTaxPercent = initialData && initialData.subtotal > 0
+        ? (initialData.impuestos / initialData.subtotal) * 100
+        : 0;
 
-    // Toggles
-    const [showNotas, setShowNotas] = useState(false)
-    const [showLegal, setShowLegal] = useState(false)
-    const [showExclusiones, setShowExclusiones] = useState(false)
-    const [showAnexos, setShowAnexos] = useState(false)
+    const [taxPercent, setTaxPercent] = useState(initialTaxPercent)
 
-    const [notas, setNotas] = useState('')
-    const [temaLegal, setTemaLegal] = useState('')
-    const [exclusiones, setExclusiones] = useState('')
-    const [anexos, setAnexos] = useState('')
+    // Toggles y textos
+    const [showNotas, setShowNotas] = useState(!!initialData?.notas_visibles)
+    const [showLegal, setShowLegal] = useState(!!initialData?.temas_legales_visibles)
+    const [showExclusiones, setShowExclusiones] = useState(!!initialData?.exclusiones_visibles)
+    const [showAnexos, setShowAnexos] = useState(!!initialData?.mostrar_anexos)
+
+    const [notas, setNotas] = useState(initialData?.notas_visibles || '')
+    const [temaLegal, setTemaLegal] = useState(initialData?.temas_legales_visibles || '')
+    const [exclusiones, setExclusiones] = useState(initialData?.exclusiones_visibles || '')
+    const [anexos, setAnexos] = useState(initialData?.texto_anexos || '')
 
     // Firma
-    const [firmaUrl, setFirmaUrl] = useState<string | null>(null)
+    const [firmaUrl, setFirmaUrl] = useState<string | null>(initialData?.firma_url || null)
 
     // Cálculos (Excluyendo Costos Adicionales)
     const subtotal = lineItems
@@ -127,7 +134,7 @@ export function CotizacionForm({ catalogItems, clientes, empresaId }: Cotizacion
 
         // Auto-completar notas si las hay
         if (result.notas_sugeridas) {
-            setNotas(prev => prev ? prev + '\n' + result.notas_sugeridas : result.notas_sugeridas!)
+            setNotas((prev: string) => prev ? prev + '\n' + result.notas_sugeridas : result.notas_sugeridas!)
             setShowNotas(true)
         }
     }
@@ -145,7 +152,7 @@ export function CotizacionForm({ catalogItems, clientes, empresaId }: Cotizacion
         setSaving(true)
         setError(null)
 
-        const result = await saveCotizacion({
+        const result = await updateCotizacion(initialData.id, {
             tipo_documento: tipoDocumento,
             cliente_nombre: clienteNombre.trim(),
             cliente_email: clienteEmail.trim(),
