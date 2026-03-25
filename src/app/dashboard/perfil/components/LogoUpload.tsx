@@ -57,6 +57,7 @@ export function LogoUpload({ logoUrl, onUploaded }: LogoUploadProps) {
                     onClick={() => inputRef.current?.click()}
                 >
                     {logoUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img src={logoUrl} alt="Logo" className="w-full h-full object-contain p-2" />
                     ) : (
                         <svg className="w-8 h-8" style={{ color: 'rgba(252,126,191,0.4)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

@@ -77,6 +77,7 @@ export function Sidebar({ userName, userCompany, userEmail, userLogo }: SidebarP
                 <div className="flex flex-col items-center gap-2">
                     {userLogo ? (
                         <div className="w-full h-12 flex items-center justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={userLogo} alt={userCompany || 'Logo'} className="max-h-full max-w-full object-contain" />
                         </div>
                     ) : (
