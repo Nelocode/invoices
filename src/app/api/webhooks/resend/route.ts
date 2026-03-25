@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
             // Buscamos el tag 'cotizacion_id' que anexamos al enviar
             const tags = data.tags || []
-            const cotizacionTag = tags.find((t: any) => t.name === 'cotizacion_id')
+            const cotizacionTag = tags.find((t: { name: string; value: string }) => t.name === 'cotizacion_id')
 
             if (cotizacionTag && cotizacionTag.value) {
                 const cotizacionId = cotizacionTag.value

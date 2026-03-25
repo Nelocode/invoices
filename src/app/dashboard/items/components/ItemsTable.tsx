@@ -143,7 +143,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
             complete: async (results) => {
                 try {
                     // Mapear cabeceras en español al formato esperado
-                    const itemsToImport: ItemFormData[] = (results.data as any[]).map(row => ({
+                    const itemsToImport: ItemFormData[] = (results.data as Record<string, string>[]).map(row => ({
                         nombre: row.Nombre?.trim() || 'Ítem sin nombre',
                         codigo_sku: row.SKU?.trim() || '',
                         descripcion: row.Descripcion?.trim() || '',
@@ -160,7 +160,7 @@ export function ItemsTable({ initialItems }: ItemsTableProps) {
                         // Recargar forzosamente para jalar desde Supabase
                         window.location.reload()
                     }
-                } catch (e) {
+                } catch {
                     setError('Error al procesar el archivo CSV. Revisa el formato.')
                 } finally {
                     setLoading(false)

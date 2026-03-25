@@ -36,6 +36,7 @@ export function ItemModal({ isOpen, onClose, onSubmit, item, loading }: ItemModa
 
     useEffect(() => {
         if (item) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setNombre(item.nombre)
             setCodigoSku(item.codigo_sku || '')
             setDescripcion(item.descripcion || '')

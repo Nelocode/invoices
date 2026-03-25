@@ -49,6 +49,7 @@ export function FirmaUpload({ firmaUrl, onUploaded }: FirmaUploadProps) {
             {firmaUrl ? (
                 <div className="flex items-center gap-4">
                     <div className="w-40 h-20 bg-white rounded-lg p-2 flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={firmaUrl} alt="Firma" className="max-w-full max-h-full object-contain" />
                     </div>
                     <button

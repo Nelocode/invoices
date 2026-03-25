@@ -145,6 +145,7 @@ export function DocumentoRender({ data }: { data: CotizacionData }) {
                 }}>
                     {/* Logo + Brand */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={data.usuario_logo_url || '/brainware-logo.webp'}
                             alt={data.usuario_empresa || 'Brainware'}
@@ -535,6 +536,7 @@ export function DocumentoRender({ data }: { data: CotizacionData }) {
                             }}>
                                 FIRMA AUTORIZADA
                             </div>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src={data.firma_url}
                                 alt="Firma"
