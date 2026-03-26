@@ -1,0 +1,46 @@
+
+> brainware-invoices@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 8.4s
+  Running TypeScript ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/19) ...
+  Generating static pages using 15 workers (4/19) 
+  Generating static pages using 15 workers (9/19) 
+  Generating static pages using 15 workers (14/19) 
+✓ Generating static pages using 15 workers (19/19) in 482.8ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /actualizar-password
+├ ƒ /api/ai-cotizar
+├ ƒ /api/ai-writer
+├ ƒ /api/send-email
+├ ƒ /api/send-quote
+├ ƒ /api/webhooks/resend
+├ ƒ /auth/callback
+├ ƒ /dashboard
+├ ƒ /dashboard/clientes
+├ ƒ /dashboard/cotizacion/[id]
+├ ƒ /dashboard/cotizaciones
+├ ƒ /dashboard/crear-cotizacion
+├ ƒ /dashboard/editar-cotizacion/[id]
+├ ƒ /dashboard/items
+├ ƒ /dashboard/perfil
+├ ○ /login
+└ ○ /recuperar
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
